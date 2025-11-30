@@ -57,7 +57,7 @@ A full-stack web application for lead generation, contact enrichment, and SEO au
 
 ### 1. Clone the Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/popsicles-dev/N-services
 cd "SEO Module"
 ```
 
