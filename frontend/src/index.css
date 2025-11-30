@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@theme {
+  --color-primary: #2563EB;
+  --color-background-light: #F3F4F6;
+  --color-background-dark: #121f20;
+  --color-surface: #FFFFFF;
+  --color-accent: #c4b5fd;
+
+  --font-display: 'Inter', sans-serif;
+
+  --animate-wave: wave 2s ease-in-out infinite;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-glow: glow 2.5s ease-in-out infinite;
+  --animate-blink: blink 5s ease-in-out infinite;
+
+  @keyframes wave {
+
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+
+    50% {
+      transform: rotate(20deg);
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes glow {
+
+    0%,
+    100% {
+      box-shadow: 0 0 10px #49d6e9, 0 0 20px #49d6e9;
+    }
+
+    50% {
+      box-shadow: 0 0 20px #49d6e9, 0 0 30px #49d6e9;
+    }
+  }
+
+  @keyframes blink {
+
+    0%,
+    50%,
+    100% {
+      opacity: 1;
+    }
+
+    52%,
+    98% {
+      opacity: 0;
+    }
+  }
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.form-checkbox {
+  @apply rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-offset-0 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:checked:bg-primary;
+}
+
+.steve-container:hover .steve-bubble {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
