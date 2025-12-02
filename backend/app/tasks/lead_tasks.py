@@ -183,8 +183,8 @@ def seo_audit_task(self, job_id: str, input_filename: str, limit: int = 1):
             db.commit()
         
         # Run Audit
-        from app.services.seo_audit import SeoAuditService
-        auditor = SeoAuditService()
+        from app.services.seo_audit import StructuralAuditService
+        auditor = StructuralAuditService()
         results = auditor.run_audit(
             input_filename=input_filename,
             limit=limit,

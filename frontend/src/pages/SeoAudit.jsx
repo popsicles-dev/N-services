@@ -203,8 +203,8 @@ export default function SeoAudit() {
     return (
         <div className="max-w-screen-2xl mx-auto">
             <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">SEO Performance Audit</h2>
-                <p className="text-gray-500 dark:text-gray-400 mt-2">Analyze website performance, Core Web Vitals, and mobile usability.</p>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">SEO Structural Audit</h2>
+                <p className="text-gray-500 dark:text-gray-400 mt-2">Analyze website structure, meta tags, headers, and on-page SEO elements.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -285,7 +285,7 @@ export default function SeoAudit() {
                                     onChange={(e) => setAuditLimit(e.target.value)}
                                     className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg p-2.5 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-primary focus:border-primary"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">Note: Each website takes ~2 minutes to audit.</p>
+                                <p className="text-xs text-gray-500 mt-1">Note: Structural audit is fast (~1-2s per site).</p>
                             </div>
 
                             <button
