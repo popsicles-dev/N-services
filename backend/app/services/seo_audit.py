@@ -98,8 +98,13 @@ class StructuralAuditService:
         # Process websites up to the limit
         total_to_process = min(limit, len(df))
         processed_count = 0
+        
+        from app.database import SessionLocal
+        from app.models import Lead, LeadAudit
+        db = SessionLocal()
 
-        for index, row in df.iterrows():
+        try:
+            for index, row in df.iterrows():
             if processed_count >= total_to_process:
                 break
 
@@ -127,6 +132,35 @@ class StructuralAuditService:
                     df.at[index, 'Canonical_Set'] = audit_results['canonical_set']
                     df.at[index, 'Audit_Status'] = 'Completed'
                     print(f"  ✓ Title: {audit_results['title'][:30]}... | Status: Success\n")
+                    
+                    # Save to Database
+                    try:
+                        lead = db.query(Lead).filter(Lead.website_url == website_url).first()
+                        if lead:
+                            # Check if audit exists
+                            existing_audit = db.query(LeadAudit).filter(LeadAudit.lead_id == lead.id).first()
+                            if not existing_audit:
+                                new_audit = LeadAudit(
+                                    lead_id=lead.id,
+                                    title_tag=audit_results['title'],
+                                    meta_description=audit_results['meta_description'],
+                                    h1_content=audit_results['h1_content'],
+                                    raw_audit_data=audit_results
+                                )
+                                db.add(new_audit)
+                            else:
+                                # Update existing
+                                existing_audit.title_tag = audit_results['title']
+                                existing_audit.meta_description = audit_results['meta_description']
+                                existing_audit.h1_content = audit_results['h1_content']
+                                existing_audit.raw_audit_data = audit_results
+                                # existing_audit.audited_at = datetime.now() # Optional: update timestamp
+                            
+                            db.commit()
+                    except Exception as e:
+                        db.rollback()
+                        print(f"Error saving audit to DB: {str(e)}")
+                        
                 else:
                     df.at[index, 'Audit_Status'] = audit_results['status']
                     print(f"  ✗ Failed: {audit_results['status']}\n")
@@ -144,6 +178,9 @@ class StructuralAuditService:
             except Exception as e:
                 df.at[index, 'Audit_Status'] = f'Error: {str(e)}'
                 print(f"  ✗ Exception: {str(e)}\n")
+
+        finally:
+            db.close()
 
         # Create audited filename
         output_filename = f"audited_{input_filename}"

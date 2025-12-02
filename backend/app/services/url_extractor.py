@@ -40,49 +40,75 @@ class URLExtractorService:
         all_results = []
         businesses_with_websites = []
         
-        for page_num in range(num_pages):
-            page_offset = page_num * 20
-            
-            params = {
-                "api_key": self.api_key,
-                "query": query,
-                "page": page_offset
-            }
-            
-            try:
-                response = requests.get(self.base_url, params=params, timeout=30)
+        from app.database import SessionLocal
+        from app.models import Lead
+        from sqlalchemy.exc import IntegrityError
+        
+        db = SessionLocal()
+        
+        try:
+            for page_num in range(num_pages):
+                page_offset = page_num * 20
                 
-                if response.status_code == 200:
-                    data = response.json()
+                params = {
+                    "api_key": self.api_key,
+                    "query": query,
+                    "page": page_offset
+                }
+                
+                try:
+                    response = requests.get(self.base_url, params=params, timeout=30)
                     
-                    if 'search_results' in data and len(data['search_results']) > 0:
-                        for result in data['search_results']:
-                            business_name = result.get('title', 'N/A')
-                            website_url = result.get('website', None)
-                            
-                            # Add to all results
-                            all_results.append({
-                                'Business Name': business_name,
-                                'Website URL': website_url if website_url else 'No website available'
-                            })
-                            
-                            # Only add to CSV list if website exists
-                            if website_url and website_url.strip():
-                                businesses_with_websites.append({
-                                    'Business Name': business_name,
-                                    'Website URL': website_url
-                                })
+                    if response.status_code == 200:
+                        data = response.json()
                         
-                        # Call progress callback if provided
-                        if progress_callback:
-                            progress_callback(page_num + 1, num_pages)
+                        if 'search_results' in data and len(data['search_results']) > 0:
+                            for result in data['search_results']:
+                                business_name = result.get('title', 'N/A')
+                                website_url = result.get('website', None)
+                                
+                                # Add to all results
+                                all_results.append({
+                                    'Business Name': business_name,
+                                    'Website URL': website_url if website_url else 'No website available'
+                                })
+                                
+                                # Only add to CSV list if website exists
+                                if website_url and website_url.strip():
+                                    businesses_with_websites.append({
+                                        'Business Name': business_name,
+                                        'Website URL': website_url
+                                    })
+                                    
+                                    # Save to Database
+                                    try:
+                                        # Check if exists first to avoid auto-increment gaps or just try insert
+                                        existing_lead = db.query(Lead).filter(Lead.website_url == website_url).first()
+                                        if not existing_lead:
+                                            new_lead = Lead(
+                                                business_name=business_name,
+                                                website_url=website_url
+                                            )
+                                            db.add(new_lead)
+                                            db.commit()
+                                    except IntegrityError:
+                                        db.rollback()
+                                    except Exception as e:
+                                        db.rollback()
+                                        print(f"Error saving lead to DB: {str(e)}")
                             
-                else:
-                    print(f"Request failed with status code: {response.status_code}")
-                    
-            except Exception as e:
-                print(f"Error on page {page_num + 1}: {str(e)}")
-                continue
+                            # Call progress callback if provided
+                            if progress_callback:
+                                progress_callback(page_num + 1, num_pages)
+                                
+                    else:
+                        print(f"Request failed with status code: {response.status_code}")
+                        
+                except Exception as e:
+                    print(f"Error on page {page_num + 1}: {str(e)}")
+                    continue
+        finally:
+            db.close()
         
         return {
             'total_found': len(all_results),

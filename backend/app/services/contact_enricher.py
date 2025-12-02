@@ -161,32 +161,60 @@ class ContactEnricherService:
         
         total_rows = len(df_input)
         
-        # Iterate through rows
-        for index, row in df_input.iterrows():
-            url = row['Website URL']
-            
-            # Ensure URL has scheme
-            if not url.startswith('http'):
-                full_url = "https://" + url
-            else:
-                full_url = url
-            
-            enrichment_data = self.scrape_website_for_contacts(full_url)
-            
-            # Update DataFrame
-            df_input.loc[index, 'Email'] = ", ".join(enrichment_data['emails']) or 'N/A'
-            df_input.loc[index, 'Phone Number'] = ", ".join(enrichment_data['phones']) or 'N/A'
-            df_input.loc[index, 'Facebook'] = enrichment_data['social_media'].get('Facebook', 'N/A')
-            df_input.loc[index, 'Twitter'] = enrichment_data['social_media'].get('Twitter', 'N/A')
-            df_input.loc[index, 'LinkedIn'] = enrichment_data['social_media'].get('LinkedIn', 'N/A')
-            df_input.loc[index, 'Instagram'] = enrichment_data['social_media'].get('Instagram', 'N/A')
-            
-            if df_input.loc[index, 'Email'] == 'N/A' and df_input.loc[index, 'Phone Number'] == 'N/A':
-                df_input.loc[index, 'Enrichment Status'] = 'No Contact Found'
-            
-            # Call progress callback
-            if progress_callback:
-                progress_callback(index + 1, total_rows)
+        from app.database import SessionLocal
+        from app.models import Lead
+        db = SessionLocal()
+        
+        try:
+            # Iterate through rows
+            for index, row in df_input.iterrows():
+                url = row['Website URL']
+                
+                # Ensure URL has scheme
+                if not url.startswith('http'):
+                    full_url = "https://" + url
+                else:
+                    full_url = url
+                
+                enrichment_data = self.scrape_website_for_contacts(full_url)
+                
+                # Update DataFrame
+                df_input.loc[index, 'Email'] = ", ".join(enrichment_data['emails']) or 'N/A'
+                df_input.loc[index, 'Phone Number'] = ", ".join(enrichment_data['phones']) or 'N/A'
+                df_input.loc[index, 'Facebook'] = enrichment_data['social_media'].get('Facebook', 'N/A')
+                df_input.loc[index, 'Twitter'] = enrichment_data['social_media'].get('Twitter', 'N/A')
+                df_input.loc[index, 'LinkedIn'] = enrichment_data['social_media'].get('LinkedIn', 'N/A')
+                df_input.loc[index, 'Instagram'] = enrichment_data['social_media'].get('Instagram', 'N/A')
+                
+                if df_input.loc[index, 'Email'] == 'N/A' and df_input.loc[index, 'Phone Number'] == 'N/A':
+                    df_input.loc[index, 'Enrichment Status'] = 'No Contact Found'
+                
+                # Update Database
+                try:
+                    lead = db.query(Lead).filter(Lead.website_url == url).first()
+                    if lead:
+                        lead.email = df_input.loc[index, 'Email'] if df_input.loc[index, 'Email'] != 'N/A' else None
+                        lead.phone_number = df_input.loc[index, 'Phone Number'] if df_input.loc[index, 'Phone Number'] != 'N/A' else None
+                        
+                        social_media = {}
+                        if df_input.loc[index, 'Facebook'] != 'N/A': social_media['Facebook'] = df_input.loc[index, 'Facebook']
+                        if df_input.loc[index, 'Twitter'] != 'N/A': social_media['Twitter'] = df_input.loc[index, 'Twitter']
+                        if df_input.loc[index, 'LinkedIn'] != 'N/A': social_media['LinkedIn'] = df_input.loc[index, 'LinkedIn']
+                        if df_input.loc[index, 'Instagram'] != 'N/A': social_media['Instagram'] = df_input.loc[index, 'Instagram']
+                        
+                        if social_media:
+                            lead.social_media = social_media
+                            
+                        db.commit()
+                except Exception as e:
+                    db.rollback()
+                    print(f"Error updating lead in DB: {str(e)}")
+
+                # Call progress callback
+                if progress_callback:
+                    progress_callback(index + 1, total_rows)
+        finally:
+            db.close()
         
         # Filter out rows with no contact info found
         df_final = df_input[df_input['Enrichment Status'] != 'No Contact Found']
