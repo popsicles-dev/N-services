@@ -9,6 +9,8 @@ class JobType(str, enum.Enum):
     URL_EXTRACTION = "url_extraction"
     CONTACT_ENRICHMENT = "contact_enrichment"
     SEO_AUDIT = "seo_audit"
+    SEO_RANKING = "seo_ranking"
+
 
 
 class JobStatus(str, enum.Enum):

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import AuditService from '../services/AuditService'
+import LeadService from '../services/LeadService'
 
 export default function SeoAudit() {
     const location = useLocation()
+    const navigate = useNavigate()
     const [files, setFiles] = useState([])
     const [selectedFile, setSelectedFile] = useState('')
     const [uploading, setUploading] = useState(false)
@@ -16,6 +18,25 @@ export default function SeoAudit() {
     const [error, setError] = useState(null)
     const [csvPreview, setCsvPreview] = useState([])
     const [auditLimit, setAuditLimit] = useState(1)
+    const [auditStartTime, setAuditStartTime] = useState(null)
+    const [elapsedTime, setElapsedTime] = useState(0)
+    const [ranking, setRanking] = useState(false)
+    const [rankProgress, setRankProgress] = useState(0)
+    const [rankingCsv, setRankingCsv] = useState(false)
+    const [rankedCsvData, setRankedCsvData] = useState(null)
+
+    // Timer effect for elapsed time
+    useEffect(() => {
+        let timer
+        if (auditStartTime) {
+            timer = setInterval(() => {
+                setElapsedTime(Math.floor((Date.now() - auditStartTime) / 1000))
+            }, 1000)
+        }
+        return () => {
+            if (timer) clearInterval(timer)
+        }
+    }, [auditStartTime])
 
     // Fetch available files on mount
     useEffect(() => {
@@ -146,6 +167,8 @@ export default function SeoAudit() {
         setAuditProgress(5)
         setError(null)
         setAuditResult(null)
+        setAuditStartTime(Date.now())
+        setElapsedTime(0)
 
         try {
             const data = await AuditService.runAudit(selectedFile, auditLimit)
@@ -156,6 +179,7 @@ export default function SeoAudit() {
         } catch (err) {
             setError('Failed to start audit: ' + (err.response?.data?.detail || err.message))
             setAuditLoading(false)
+            setAuditStartTime(null)
         }
     }
 
@@ -169,11 +193,13 @@ export default function SeoAudit() {
                     setAuditLoading(false)
                     setAuditProgress(100)
                     setAuditResult(job)
+                    setAuditStartTime(null)
                     fetchAuditPreview(id)
                 } else if (job.status === 'failed') {
                     clearInterval(interval)
                     setAuditLoading(false)
                     setError('Audit failed: ' + job.error)
+                    setAuditStartTime(null)
                 } else {
                     setAuditProgress(prev => Math.min(prev + 5, 90))
                 }
@@ -181,6 +207,7 @@ export default function SeoAudit() {
                 clearInterval(interval)
                 setAuditLoading(false)
                 setError('Error checking status')
+                setAuditStartTime(null)
             }
         }, 2000)
     }
@@ -198,6 +225,113 @@ export default function SeoAudit() {
         if (auditResult && auditResult.job_id) {
             window.open(AuditService.getDownloadUrl(auditResult.job_id), '_blank')
         }
+    }
+
+    const handleRankSeo = async () => {
+        if (!auditResult || !auditResult.result_file) return
+
+        setRanking(true)
+        setError(null)
+        setRankProgress(5)
+
+        try {
+            const data = await LeadService.rankSeo(auditResult.result_file)
+            const rankJobId = data.job_id
+            pollRankStatus(rankJobId)
+        } catch (err) {
+            setError('Failed to start SEO ranking: ' + (err.response?.data?.detail || err.message))
+            setRanking(false)
+        }
+    }
+
+    const pollRankStatus = async (id) => {
+        const interval = setInterval(async () => {
+            try {
+                const job = await LeadService.getJobStatus(id)
+
+                if (job.status === 'completed') {
+                    clearInterval(interval)
+                    setRanking(false)
+                    setRankProgress(100)
+
+                    // Navigate to Lead Generation page with the ranked file
+                    navigate('/lead-generation', { state: { filename: job.result_file } })
+                } else if (job.status === 'failed') {
+                    clearInterval(interval)
+                    setRanking(false)
+                    setError('SEO ranking failed: ' + job.error_message)
+                } else {
+                    if (job.total_items > 0) {
+                        const percent = Math.min((job.processed_items / job.total_items) * 100, 95)
+                        setRankProgress(Math.round(percent))
+                    } else {
+                        setRankProgress(prev => Math.min(prev + 2, 95))
+                    }
+                }
+            } catch (err) {
+                clearInterval(interval)
+                setRanking(false)
+                setError('Error checking ranking status')
+            }
+        }, 3000)
+    }
+
+    const handleCsvRanking = async (file) => {
+        setRankingCsv(true)
+        setError(null)
+        setRankedCsvData(null)
+
+        try {
+            const formData = new FormData()
+            formData.append('file', file)
+
+            const response = await fetch('http://localhost:8000/api/leads/rank-csv-file', {
+                method: 'POST',
+                body: formData
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(errorData.detail || 'Failed to rank CSV')
+            }
+
+            const data = await response.json()
+            setRankedCsvData(data.data)
+            setRankingCsv(false)
+
+        } catch (err) {
+            setError('CSV ranking failed: ' + err.message)
+            setRankingCsv(false)
+        }
+    }
+
+    const handleDownloadRankedCsv = () => {
+        if (!rankedCsvData || rankedCsvData.length === 0) return
+
+        // Convert to CSV
+        const headers = Object.keys(rankedCsvData[0])
+        const csvContent = [
+            headers.join(','),
+            ...rankedCsvData.map(row => headers.map(header => {
+                const value = row[header]
+                // Escape values with commas or quotes
+                if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                    return `"${value.replace(/"/g, '""')}"`
+                }
+                return value
+            }).join(','))
+        ].join('\n')
+
+        // Download
+        const blob = new Blob([csvContent], { type: 'text/csv' })
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `ranked_${new Date().toISOString().slice(0, 10)}.csv`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
     }
 
     return (
@@ -315,7 +449,9 @@ export default function SeoAudit() {
             {auditLoading && (
                 <div className="mb-8">
                     <div className="flex justify-between items-center mb-1">
-                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Auditing websites (1 website for demo)...</p>
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Auditing websites... {elapsedTime > 0 && `(${Math.floor(elapsedTime / 60)}:${(elapsedTime % 60).toString().padStart(2, '0')})`}
+                        </p>
                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{auditProgress}%</p>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
@@ -323,49 +459,206 @@ export default function SeoAudit() {
                     </div>
                 </div>
             )}
+            {ranking && (
+                <div className="mb-8">
+                    <div className="flex justify-between items-center mb-1">
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Ranking by SEO performance...</p>
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{rankProgress}%</p>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                        <div className="bg-purple-500 h-2.5 rounded-full transition-all duration-500" style={{ width: `${rankProgress}%` }}></div>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">⚠️ This may take 4-5 seconds per lead (auditing both mobile & desktop)</p>
+                </div>
+            )}
 
-            {/* Results Area */}
-            {auditResult && (
-                <div className="bg-white/50 dark:bg-gray-900/50 rounded-xl shadow-sm overflow-hidden mb-8 backdrop-blur-sm">
-                    <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <div>
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Audit Complete</h3>
-                            <p className="text-sm text-gray-500">Processed {auditResult.total_processed} websites</p>
-                        </div>
+            {/* Results Area - Always show, with dummy data if no audit yet */}
+            <div className="bg-white/50 dark:bg-gray-900/50 rounded-xl shadow-sm overflow-hidden mb-8 backdrop-blur-sm">
+                <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <div>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                            {auditResult ? "Audit Complete" : "Example Audit Output"}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                            {auditResult
+                                ? `Processed ${auditResult.total_processed} websites`
+                                : "This is how your audit results will look."
+                            }
+                        </p>
+                    </div>
+                    <button
+                        onClick={handleDownload}
+                        disabled={!auditResult}
+                        className={`flex items-center justify-center rounded-lg h-10 px-4 bg-green-500 text-white text-sm font-bold transition-colors shadow-lg shadow-green-500/30 ${!auditResult ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:bg-green-600'}`}
+                    >
+                        Download Audit Report
+                    </button>
+                </div>
+
+                <div className="overflow-x-auto max-h-96 overflow-y-auto">
+                    {auditResult && csvPreview.length > 0 ? (
+                        /* Real Audit Results */
+                        <table className="w-full text-sm text-left">
+                            <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50/50 dark:bg-gray-800/50 sticky top-0">
+                                <tr>
+                                    {csvPreview[0].map((header, index) => (
+                                        <th key={index} className="px-6 py-3 whitespace-nowrap bg-gray-50 dark:bg-gray-800">{header}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {csvPreview.slice(1).map((row, rowIndex) => (
+                                    <tr key={rowIndex} className="border-b dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+                                        {row.map((cell, cellIndex) => (
+                                            <td key={cellIndex} className="px-6 py-4 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                                                {cell}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        /* Dummy Preview Table */
+                        <table className="w-full text-sm text-left opacity-60">
+                            <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50/50 dark:bg-gray-800/50 sticky top-0">
+                                <tr>
+                                    <th className="px-6 py-3 whitespace-nowrap bg-gray-50 dark:bg-gray-800 text-gray-400">Website</th>
+                                    <th className="px-6 py-3 whitespace-nowrap bg-gray-50 dark:bg-gray-800 text-gray-400">Performance</th>
+                                    <th className="px-6 py-3 whitespace-nowrap bg-gray-50 dark:bg-gray-800 text-gray-400">Accessibility</th>
+                                    <th className="px-6 py-3 whitespace-nowrap bg-gray-50 dark:bg-gray-800 text-gray-400">Best Practices</th>
+                                    <th className="px-6 py-3 whitespace-nowrap bg-gray-50 dark:bg-gray-800 text-gray-400">SEO</th>
+                                    <th className="px-6 py-3 whitespace-nowrap bg-gray-50 dark:bg-gray-800 text-gray-400">Mobile Friendly</th>
+                                    <th className="px-6 py-3 whitespace-nowrap bg-gray-50 dark:bg-gray-800 text-gray-400">Load Time (s)</th>
+                                    <th className="px-6 py-3 whitespace-nowrap bg-gray-50 dark:bg-gray-800 text-gray-400">Page Size (KB)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr className="border-b dark:border-gray-800">
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">example.com</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">85</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">92</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">88</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">95</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">Yes</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">2.3</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">1250</td>
+                                </tr>
+                                <tr className="border-b dark:border-gray-800">
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">citybakery.com</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">72</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">88</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">79</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">91</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">Yes</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">3.1</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">2100</td>
+                                </tr>
+                                <tr className="border-b dark:border-gray-800">
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">techsol.io</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">91</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">95</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">93</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">98</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">Yes</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">1.8</td>
+                                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">890</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            </div>
+
+            {/* CSV Ranking Section */}
+            <div className="bg-white/50 dark:bg-gray-900/50 rounded-xl shadow-sm overflow-hidden backdrop-blur-sm">
+                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Rank Audited CSV</h3>
+                    <p className="text-sm text-gray-500">Upload an already-audited CSV to rank by SEO performance using PainScore algorithm</p>
+                </div>
+
+                <div className="p-6">
+                    <div className="flex items-center gap-4 mb-4">
+                        <input
+                            id="csv-rank-upload"
+                            type="file"
+                            accept=".csv"
+                            onChange={(e) => {
+                                const file = e.target.files[0]
+                                if (file) {
+                                    handleCsvRanking(file)
+                                }
+                            }}
+                            className="block flex-1 text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 focus:outline-none p-2.5"
+                        />
                         <button
-                            onClick={handleDownload}
-                            className="flex items-center justify-center rounded-lg h-10 px-4 bg-green-500 text-white text-sm font-bold hover:bg-green-600 transition-colors shadow-lg shadow-green-500/30"
+                            onClick={() => document.getElementById('csv-rank-upload').click()}
+                            disabled={rankingCsv}
+                            className={`flex items-center justify-center rounded-lg h-10 px-6 bg-purple-500 text-white text-sm font-bold transition-colors shadow-lg shadow-purple-500/30 whitespace-nowrap ${rankingCsv ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:bg-purple-600'}`}
                         >
-                            Download Audit Report
+                            {rankingCsv ? 'Ranking...' : 'Start Ranking'}
                         </button>
                     </div>
 
-                    {csvPreview.length > 0 && (
-                        <div className="overflow-x-auto max-h-96 overflow-y-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50/50 dark:bg-gray-800/50 sticky top-0">
-                                    <tr>
-                                        {csvPreview[0].map((header, index) => (
-                                            <th key={index} className="px-6 py-3 whitespace-nowrap bg-gray-50 dark:bg-gray-800">{header}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {csvPreview.slice(1).map((row, rowIndex) => (
-                                        <tr key={rowIndex} className="border-b dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
-                                            {row.map((cell, cellIndex) => (
-                                                <td key={cellIndex} className="px-6 py-4 text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                                                    {cell}
-                                                </td>
-                                            ))}
+                    {rankingCsv && (
+                        <div className="mt-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Ranking CSV...</p>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Processing</p>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                <div className="bg-purple-500 h-2.5 rounded-full transition-all duration-500 animate-pulse" style={{ width: '100%' }}></div>
+                            </div>
+                        </div>
+                    )}
+
+                    {rankedCsvData && rankedCsvData.length > 0 && (
+                        <div className="mt-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                                    ✓ Ranked {rankedCsvData.length} leads successfully
+                                </p>
+                                <button
+                                    onClick={handleDownloadRankedCsv}
+                                    className="flex items-center justify-center rounded-lg h-10 px-4 bg-green-500 text-white text-sm font-bold hover:bg-green-600 transition-colors shadow-lg shadow-green-500/30"
+                                >
+                                    Download Ranked CSV
+                                </button>
+                            </div>
+
+                            <div className="overflow-x-auto max-h-96 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rank</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Website</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">PainScore</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Mobile Score</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Desktop Score</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                                        {rankedCsvData.slice(0, 10).map((row, idx) => (
+                                            <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{row.SEO_Rank}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{row.Website || row.WEBSITE || 'N/A'}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-600 dark:text-red-400">{row.PainScore}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{row.Mobile_Score}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{row.Desktop_Score}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {rankedCsvData.length > 10 && (
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 text-center">
+                                    Showing top 10 of {rankedCsvData.length} ranked leads
+                                </p>
+                            )}
                         </div>
                     )}
                 </div>
-            )}
+            </div>
         </div>
     )
 }

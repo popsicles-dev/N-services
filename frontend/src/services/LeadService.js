@@ -25,6 +25,13 @@ class LeadService {
         return response.data;
     }
 
+    async rankSeo(filename) {
+        const response = await axios.post(`${API_BASE_URL}/rank-seo`, {
+            input_filename: filename
+        });
+        return response.data;
+    }
+
     async fetchCsvPreview(jobId) {
         const response = await axios.get(`${API_BASE_URL}/download/${jobId}`, {
             responseType: 'text'

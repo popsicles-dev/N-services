@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from app.database import get_db
 from app.models import Job, JobType, JobStatus
-from app.tasks import extract_urls_task, enrich_contacts_task
+from app.tasks import extract_urls_task, enrich_contacts_task, seo_ranking_task
 import uuid
 import json
 import os
@@ -164,6 +164,54 @@ async def start_contact_enrichment(
         status="pending",
         message="Contact enrichment job started"
     )
+
+
+@router.post("/rank-seo", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED)
+async def start_seo_ranking(
+    request: ContactEnrichmentRequest,  # Reuse same request model (just needs input_filename)
+    db: Session = Depends(get_db)
+):
+    """Start a background job to rank leads by SEO performance.
+    
+    Args:
+        request: SEO ranking parameters (input_filename)
+        db: Database session
+        
+    Returns:
+        Job ID and status
+    """
+    # Verify input file exists
+    input_filepath = f"{settings.OUTPUT_DIR}/{request.input_filename}"
+    if not os.path.exists(input_filepath):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Input file '{request.input_filename}' not found"
+        )
+    
+    # Create new job (removed caching check due to JSON comparison issues)
+    job_service = JobService(db)
+    input_params = {
+        "input_filename": request.input_filename
+    }
+
+    job = job_service.create_job(
+        job_type=JobType.SEO_RANKING,
+        input_params=input_params
+    )
+    job_id = job.id
+    
+    # Start Celery task
+    seo_ranking_task.delay(
+        job_id=job_id,
+        input_filename=request.input_filename
+    )
+    
+    return JobResponse(
+        job_id=job_id,
+        status="pending",
+        message="SEO ranking job started"
+    )
+
 
 
 @router.post("/audit/run", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED)
@@ -370,3 +418,47 @@ async def list_output_files():
     ]
     
     return {"files": files, "count": len(files)}
+
+
+@router.post("/rank-csv-file")
+async def rank_csv_file(file: UploadFile = File(...)):
+    """
+    Rank an already-audited CSV file using PainScore algorithm.
+    No API calls needed - just calculates from existing data.
+    """
+    from app.services.csv_ranker import CsvRankerService
+    
+    # Validate file type
+    if not file.filename.endswith('.csv'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only CSV files are allowed"
+        )
+    
+    try:
+        # Read file content
+        content = await file.read()
+        
+        # Rank the CSV
+        ranker = CsvRankerService()
+        result = ranker.rank_csv(content)
+        
+        if not result['valid']:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=result.get('error', 'Invalid CSV format')
+            )
+        
+        return {
+            "success": True,
+            "data": result['data'],
+            "total_ranked": result['total_ranked']
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error processing CSV: {str(e)}"
+        )

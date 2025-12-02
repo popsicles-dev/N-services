@@ -20,6 +20,11 @@ export default function LeadGeneration() {
     const [enrichProgress, setEnrichProgress] = useState(0)
     const [isEnriched, setIsEnriched] = useState(false)
 
+    // SEO Ranking State
+    const [ranking, setRanking] = useState(false)
+    const [rankProgress, setRankProgress] = useState(0)
+    const [isRanked, setIsRanked] = useState(false)
+
     // Filtering State
     const [filterText, setFilterText] = useState('')
     const [activeColumnFilters, setActiveColumnFilters] = useState(new Set())
@@ -144,6 +149,85 @@ export default function LeadGeneration() {
             setError('Failed to start enrichment: ' + (err.response?.data?.detail || err.message))
             setEnriching(false)
         }
+    }
+
+    const handleRankSeo = async () => {
+        if (!results || !results.result_file) return
+
+        setRanking(true)
+        setError(null)
+        setRankProgress(5)
+
+        try {
+            let filenameToUse = results.result_file
+
+            // If leads are selected, create a partial CSV and upload it
+            if (selectedIds.size > 0) {
+                const selectedRows = csvData.rows
+                    .filter(row => selectedIds.has(row.id))
+                    .map(row => row.data)
+
+                const csv = LeadService.generateCsv(csvData.headers, selectedRows)
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+                const file = new File([blob], `selected_leads_rank_${Date.now()}.csv`, { type: 'text/csv' })
+
+                const uploadData = await AuditService.uploadFile(file)
+                filenameToUse = uploadData.filename
+            }
+
+            const data = await LeadService.rankSeo(filenameToUse)
+
+            const rankJobId = data.job_id
+            pollRankStatus(rankJobId)
+
+        } catch (err) {
+            setError('Failed to start SEO ranking: ' + (err.response?.data?.detail || err.message))
+            setRanking(false)
+        }
+    }
+
+    const pollRankStatus = async (id) => {
+        const interval = setInterval(async () => {
+            try {
+                const job = await LeadService.getJobStatus(id)
+
+                if (job.status === 'completed') {
+                    clearInterval(interval)
+                    setRanking(false)
+                    setRankProgress(100)
+                    setIsRanked(true)
+
+                    // Update results with new file
+                    setResults(prev => ({
+                        ...prev,
+                        result_file: job.result_file
+                    }))
+
+                    // Refresh preview with ranked data
+                    fetchCsvPreview(id)
+
+                    // Update the main job ID for download button
+                    setJobId(id)
+
+                } else if (job.status === 'failed') {
+                    clearInterval(interval)
+                    setRanking(false)
+                    setError('SEO ranking failed: ' + job.error_message)
+                } else {
+                    // Progress based on processed items
+                    if (job.total_items > 0) {
+                        const percent = Math.min((job.processed_items / job.total_items) * 100, 95)
+                        setRankProgress(Math.round(percent))
+                    } else {
+                        setRankProgress(prev => Math.min(prev + 2, 95))
+                    }
+                }
+            } catch (err) {
+                clearInterval(interval)
+                setRanking(false)
+                setError('Error checking ranking status')
+            }
+        }, 3000) // Poll every 3 seconds (ranking takes longer)
     }
 
     const pollEnrichStatus = async (id) => {
@@ -454,19 +538,29 @@ export default function LeadGeneration() {
                     </div>
                 )
             }
-            {
-                enriching && (
-                    <div className="mb-8">
-                        <div className="flex justify-between items-center mb-1">
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Enriching contacts...</p>
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{enrichProgress}%</p>
-                        </div>
-                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                            <div className="bg-purple-500 h-2.5 rounded-full transition-all duration-500" style={{ width: `${enrichProgress}%` }}></div>
-                        </div>
+            {enriching && (
+                <div className="mb-8">
+                    <div className="flex justify-between items-center mb-1">
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Enriching contacts...</p>
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{enrichProgress}%</p>
                     </div>
-                )
-            }
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                        <div className="bg-purple-500 h-2.5 rounded-full transition-all duration-500" style={{ width: `${enrichProgress}%` }}></div>
+                    </div>
+                </div>
+            )}
+            {ranking && (
+                <div className="mb-8">
+                    <div className="flex justify-between items-center mb-1">
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Ranking by SEO performance...</p>
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{rankProgress}%</p>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                        <div className="bg-orange-500 h-2.5 rounded-full transition-all duration-500" style={{ width: `${rankProgress}%` }}></div>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">⚠️ This may take 4-5 seconds per lead (auditing both mobile & desktop)</p>
+                </div>
+            )}
 
             {/* Unified Results Container */}
             <div className="bg-white/50 dark:bg-gray-900/50 rounded-xl shadow-sm overflow-hidden mb-8 backdrop-blur-sm flex flex-col min-h-[500px]">
@@ -515,8 +609,8 @@ export default function LeadGeneration() {
                             </div>
                             <button
                                 onClick={handleEnrich}
-                                disabled={!results || loading || enriching || isEnriched}
-                                className={`flex items-center justify-center rounded-lg h-10 px-6 bg-green-500 text-white text-sm font-bold hover:bg-green-600 transition-colors shadow-sm ${(!results || loading || enriching || isEnriched) ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                                disabled={!results || loading || enriching || ranking || isEnriched}
+                                className={`flex items-center justify-center rounded-lg h-10 px-6 bg-green-500 text-white text-sm font-bold hover:bg-green-600 transition-colors shadow-sm ${(!results || loading || enriching || ranking || isEnriched) ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                             >
                                 <span className="truncate">{isEnriched ? 'Enriched' : (selectedIds.size > 0 ? `Enrich Selected (${selectedIds.size})` : 'Enrich Leads')}</span>
                             </button>
