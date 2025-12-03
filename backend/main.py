@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from config import settings
 from app.database import init_db
-from app.routers import leads, chat
+from app.routers import leads, chat, auth
 import os
 
 # Create FastAPI application
@@ -23,6 +23,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(leads.router, prefix="/api/leads", tags=["leads"])
 app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
 

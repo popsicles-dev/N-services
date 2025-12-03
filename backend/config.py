@@ -21,11 +21,17 @@ class Settings(BaseSettings):
     # Groq API (Chatbot)
     GROQ_API_KEY: str = "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" # User must set this in .env
 
+    # JWT Authentication
+    JWT_SECRET_KEY: str = "your-secret-key-change-in-production"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
 
     # Application
     APP_NAME: str = "SEO Lead Generation API"
     DEBUG: bool = True
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:3000"]
     
     # File Storage
     OUTPUT_DIR: str = "outputs"

@@ -67,6 +67,199 @@
   }
 }
 
+/* ============================================
+   SCROLL-DRIVEN ANIMATIONS
+   ============================================ */
+
+/* Base state for fade-in-view elements (hidden) */
+.fade-in-view {
+  opacity: 0;
+  transform: translateY(60px) scale(0.95);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+/* Visible state - triggered by useScrollAnimation hook */
+.fade-in-view.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Slide from left */
+.fade-in-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-in-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Slide from right */
+.fade-in-right {
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-in-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Scale up animation */
+.scale-in {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scale-in.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================
+   STAGGER ANIMATIONS
+   ============================================ */
+
+.stagger-item {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stagger-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger reveal for data-stagger elements */
+[data-stagger] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-stagger].stagger-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================
+   STACKING SECTION ANIMATIONS (SLIDES)
+   ============================================ */
+
+/* Scroll-driven section - each section is a "slide" */
+.scroll-section {
+  position: relative;
+  min-height: 100vh;
+  opacity: 0;
+  transform: translateY(100px) scale(0.92);
+  transition: opacity 0.6s ease-out,
+              transform 0.6s ease-out;
+  will-change: opacity, transform;
+}
+
+.scroll-section.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.scroll-section.exiting {
+  opacity: 0.3;
+  transform: translateY(-50px) scale(0.98);
+}
+
+/* Sticky stacking container */
+.stacking-container {
+  position: relative;
+}
+
+.stacking-section {
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: inherit;
+}
+
+/* ============================================
+   HOVER LIFT EFFECT
+   ============================================ */
+
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   ANIMATION DELAYS FOR STAGGER EFFECTS
+   ============================================ */
+
+.animation-delay-100 { animation-delay: 100ms; transition-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; transition-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; transition-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; transition-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; transition-delay: 500ms; }
+.animation-delay-600 { animation-delay: 600ms; transition-delay: 600ms; }
+.animation-delay-700 { animation-delay: 700ms; transition-delay: 700ms; }
+.animation-delay-800 { animation-delay: 800ms; transition-delay: 800ms; }
+.animation-delay-900 { animation-delay: 900ms; transition-delay: 900ms; }
+.animation-delay-1000 { animation-delay: 1000ms; transition-delay: 1000ms; }
+
+/* ============================================
+   PARALLAX BACKGROUND EFFECTS
+   ============================================ */
+
+.parallax-bg {
+  will-change: transform;
+  transition: transform 0.1s linear;
+}
+
+/* ============================================
+   SMOOTH SCROLLING
+   ============================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in-view,
+  .fade-in-left,
+  .fade-in-right,
+  .scale-in,
+  .stagger-item,
+  [data-stagger],
+  .scroll-section,
+  .hover-lift {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   font-family: 'Inter', sans-serif;
 }

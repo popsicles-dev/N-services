@@ -20,8 +20,7 @@ class Lead(Base):
     
     # Store social media links as a JSON object (flexible schema)
     # e.g., {'Facebook': 'url', 'LinkedIn': 'url'}
-    social_media = Column(JSON, nullable=True) 
-    
+    social_media = Column(JSON, nullable=True)
     # LLM Lead Score (Intent_Score) - Qualitative LLM judgment
     intent_score = Column(String, nullable=True) 
     

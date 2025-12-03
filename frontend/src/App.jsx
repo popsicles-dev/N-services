@@ -1,52 +1,122 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './index.css'
-import LeadGeneration from './pages/LeadGeneration'
-import SeoAudit from './pages/SeoAudit'
+import Dashboard from './pages/Dashboard'
+import Login from './pages/Login'
+import Register from './pages/Register'
 import Steve from './components/Steve'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom'
+import logo from './assets/nodra-logo.png'
+
+function AppContent() {
+  const { isAuthenticated, user, logout } = useAuth()
+  const [pageLoaded, setPageLoaded] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const location = useLocation()
+  const isAuthPage = ['/login', '/register'].includes(location.pathname)
+
+  // Initial page fade-in effect
+  useEffect(() => {
+    const timer = setTimeout(() => setPageLoaded(true), 100)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Track scroll for header transparency
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Smooth scroll to section
+  const scrollToSection = (e, sectionId) => {
+    e.preventDefault()
+    const el = document.getElementById(sectionId)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  return (
+    <div className={`min-h-screen w-full text-gray-900 font-body relative overflow-x-hidden selection:bg-blue-500 selection:text-white transition-all duration-1000 ease-out ${pageLoaded ? 'opacity-100' : 'opacity-0'}`}>
+
+      {/* Fixed Background Gradient */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-cyan-50"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-200/20 rounded-full blur-[100px] animate-float"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-200/20 rounded-full blur-[100px] animate-float animation-delay-1000"></div>
+      </div>
+
+      {/* Fixed Header with scroll-aware styling */}
+      <header className={`fixed top-0 left-0 right-0 z-50 px-6 lg:px-10 py-4 flex justify-between items-center transition-all duration-300 ${scrolled ? 'backdrop-blur-xl bg-white/90 shadow-lg shadow-gray-100/50 border-b border-gray-100' : 'bg-transparent'}`}>
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 overflow-hidden">
+            <img src={logo} alt="NODRA Logo" className="h-full w-auto max-w-none object-cover object-left" />
+          </div>
+          <h1 className="text-xl font-bold text-gray-900 font-display tracking-tight">
+            NODRA
+          </h1>
+        </div>
+
+        {/* Navigation Links */}
+        {!isAuthPage && (
+          <nav className="hidden lg:flex items-center gap-8">
+            <a href="#lead-extraction" onClick={(e) => scrollToSection(e, 'lead-extraction')} className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">Lead Extraction</a>
+            <a href="#seo-audit" onClick={(e) => scrollToSection(e, 'seo-audit')} className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">SEO Audit</a>
+            <a href="#email-generation" onClick={(e) => scrollToSection(e, 'email-generation')} className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">Email Generation</a>
+            <a href="#sending" onClick={(e) => scrollToSection(e, 'sending')} className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">Sending</a>
+          </nav>
+        )}
+
+        <div className="flex items-center gap-4">
+          {isAuthenticated ? (
+            <>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/25">
+                  {user?.username?.charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden sm:block text-sm font-medium text-gray-700">{user?.username}</span>
+              </div>
+              <button onClick={logout} className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-red-500 transition-colors">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Login</Link>
+              <Link to="/register" className="px-5 py-2.5 text-sm font-medium text-white bg-[#22d3ee] hover:bg-[#06b6d4] rounded-xl shadow-lg shadow-cyan-500/25 transition-all hover:scale-105 active:scale-95">
+                Get Started
+              </Link>
+            </>
+          )}
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="relative z-10">
+        <Routes>
+          <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
+          <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
+        </Routes>
+      </main>
+
+      {/* Steve - Fixed Bottom Right */}
+      {isAuthenticated && (
+        <div className="fixed bottom-6 right-6 z-40">
+          <Steve />
+        </div>
+      )}
+    </div>
+  )
+}
 
 function App() {
   return (
     <Router>
-      <div className="relative flex w-full h-screen mx-auto overflow-hidden bg-background-light dark:bg-background-dark">
-        {/* Main Content - 5/6 width */}
-        <div className="layout-container flex h-full grow flex-col w-5/6">
-          {/* Header */}
-          <header className="flex items-center justify-between whitespace-nowrap border-b border-gray-200/50 dark:border-gray-800/50 px-10 py-4">
-            <div className="flex items-center gap-3">
-              <div className="size-8 text-primary">
-                <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                  <path clipRule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fillRule="evenodd" />
-                </svg>
-              </div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">SEO Lead Engine</h1>
-            </div>
-            <div className="flex flex-1 justify-end items-center gap-6">
-              <nav className="flex items-center gap-6">
-                <Link to="/" className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors group">
-                  <svg className="w-5 h-5 mr-3 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                  <span className="font-medium">Lead Extraction</span>
-                </Link>
-                <Link to="/seo-audit" className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors group">
-                  <svg className="w-5 h-5 mr-3 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                  <span className="font-medium">SEO Audit</span>
-                </Link>
-              </nav>
-            </div>
-          </header>
-
-          {/* Main Content */}
-          <main className="flex-1 px-4 sm:px-6 lg:px-8 xl:px-20 py-8 overflow-y-auto">
-            <Routes>
-              <Route path="/" element={<LeadGeneration />} />
-              <Route path="/seo-audit" element={<SeoAudit />} />
-            </Routes>
-          </main>
-        </div>
-
-        {/* Steve Chatbot - 1/6 width */}
-        <Steve />
-      </div>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   )
 }
