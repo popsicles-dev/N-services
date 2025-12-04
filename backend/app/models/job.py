@@ -8,7 +8,8 @@ class JobType(str, enum.Enum):
     """Types of jobs that can be processed."""
     URL_EXTRACTION = "url_extraction"
     CONTACT_ENRICHMENT = "contact_enrichment"
-    SEO_AUDIT = "seo_audit"
+    STRUCTURAL_AUDIT = "structural_audit"
+    LEAD_SCORING = "lead_scoring"
     SEO_RANKING = "seo_ranking"
 
 

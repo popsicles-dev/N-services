@@ -35,6 +35,7 @@ fastapi
 uvicorn
 python-dotenv
 sentence-transformers
-groqw
+groq
 numpy
 pickle-mixin
+email-validator

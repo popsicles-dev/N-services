@@ -20,7 +20,7 @@ class JobService:
         """Create a new job record.
         
         Args:
-            job_type: Type of job (URL_EXTRACTION, CONTACT_ENRICHMENT, SEO_AUDIT)
+            job_type: Type of job (URL_EXTRACTION, CONTACT_ENRICHMENT, STRUCTURAL_AUDIT, LEAD_SCORING)
             input_params: Dictionary of input parameters
             
         Returns:

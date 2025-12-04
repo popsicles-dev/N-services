@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from app.database import get_db
 from app.models import Job, JobType, JobStatus
-from app.tasks import extract_urls_task, enrich_contacts_task, seo_ranking_task
+from app.tasks import extract_urls_task, enrich_contacts_task, seo_ranking_task, structural_audit_task, lead_scoring_task
 import uuid
 import json
 import os
@@ -214,20 +214,12 @@ async def start_seo_ranking(
 
 
 
-@router.post("/audit/run", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED)
-async def start_seo_audit(
+@router.post("/audit/structural-run", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED)
+async def start_structural_audit(
     request: AuditRequest,
     db: Session = Depends(get_db)
 ):
-    """Start a background job to audit websites from a CSV file.
-    
-    Args:
-        request: Audit parameters
-        db: Database session
-        
-    Returns:
-        Job ID and status
-    """
+    """Start a background job for Structural Audit (Stage 1)."""
     # Verify input file exists
     input_filepath = f"{settings.OUTPUT_DIR}/{request.input_filename}"
     if not os.path.exists(input_filepath):
@@ -243,7 +235,7 @@ async def start_seo_audit(
         "limit": request.limit
     }
     
-    existing_job = job_service.find_existing_job(JobType.SEO_AUDIT, input_params)
+    existing_job = job_service.find_existing_job(JobType.STRUCTURAL_AUDIT, input_params)
     if existing_job:
         return JobResponse(
             job_id=existing_job.id,
@@ -252,14 +244,13 @@ async def start_seo_audit(
         )
 
     job = job_service.create_job(
-        job_type=JobType.SEO_AUDIT,
+        job_type=JobType.STRUCTURAL_AUDIT,
         input_params=input_params
     )
     job_id = job.id
     
     # Start Celery task
-    from app.tasks.lead_tasks import seo_audit_task
-    seo_audit_task.delay(
+    structural_audit_task.delay(
         job_id=job_id,
         input_filename=request.input_filename,
         limit=request.limit
@@ -268,7 +259,54 @@ async def start_seo_audit(
     return JobResponse(
         job_id=job_id,
         status="pending",
-        message="SEO audit job started"
+        message="Structural audit job started"
+    )
+
+
+@router.post("/audit/score-run", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED)
+async def start_lead_scoring(
+    request: ContactEnrichmentRequest, # Reuse model as we just need filename
+    db: Session = Depends(get_db)
+):
+    """Start a background job for Lead Scoring (Stage 2)."""
+    # Verify input file exists
+    input_filepath = f"{settings.OUTPUT_DIR}/{request.input_filename}"
+    if not os.path.exists(input_filepath):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Input file '{request.input_filename}' not found"
+        )
+    
+    # Check for existing job
+    job_service = JobService(db)
+    input_params = {
+        "input_filename": request.input_filename
+    }
+    
+    existing_job = job_service.find_existing_job(JobType.LEAD_SCORING, input_params)
+    if existing_job:
+        return JobResponse(
+            job_id=existing_job.id,
+            status="completed",
+            message="Returning cached results"
+        )
+
+    job = job_service.create_job(
+        job_type=JobType.LEAD_SCORING,
+        input_params=input_params
+    )
+    job_id = job.id
+    
+    # Start Celery task
+    lead_scoring_task.delay(
+        job_id=job_id,
+        input_filename=request.input_filename
+    )
+    
+    return JobResponse(
+        job_id=job_id,
+        status="pending",
+        message="Lead scoring job started"
     )
 
 

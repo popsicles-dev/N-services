@@ -2,6 +2,7 @@ import os
 import pickle
 import numpy as np
 import chromadb
+import json
 from sentence_transformers import SentenceTransformer
 from groq import Groq
 from config import settings
@@ -158,6 +159,39 @@ The provided documents do not contain the required SEO information to answer thi
         except Exception as e:
             print(f"DEBUG: Generation error: {e}")
             return f"Error generating answer: {str(e)}"
+
+    def generate_lead_score(self, audit_data: dict) -> dict:
+        """Generate lead score (0-100) where HIGH score means BAD SEO (High Potential)."""
+        if not self.groq_client:
+            return {"score": 0, "justification": "LLM not configured"}
+            
+        prompt = f"""
+        You are a Lead Scoring Agent for an SEO Agency.
+        Analyze this website's SEO audit data to determine if they are a good potential client.
+        
+        SCORING RULES:
+        - 0-30: Good SEO (Low potential client - they don't need us)
+        - 31-70: Mixed SEO (Medium potential)
+        - 71-100: Bad/Missing SEO (High potential client - urgent need for our services)
+        
+        AUDIT DATA:
+        {audit_data}
+        
+        Return ONLY JSON: {{ "score": <int>, "justification": "<brief string>" }}
+        """
+
+        try:
+            resp = self.groq_client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=200,
+                response_format={"type": "json_object"}
+            )
+            content = resp.choices[0].message.content
+            return json.loads(content)
+        except Exception as e:
+            print(f"DEBUG: Scoring error: {e}")
+            return {"score": 0, "justification": f"Error: {str(e)}"}
 
 # Global instance
 rag_service = RagService()

@@ -157,14 +157,8 @@ def enrich_contacts_task(self, job_id: str, input_filename: str):
 
 
 @celery_app.task(bind=True, base=DatabaseTask)
-def seo_audit_task(self, job_id: str, input_filename: str, limit: int = 1):
-    """Celery task for SEO Audit.
-    
-    Args:
-        job_id: Database job ID
-        input_filename: Name of input CSV file
-        limit: Max websites to audit
-    """
+def structural_audit_task(self, job_id: str, input_filename: str, limit: int = 1):
+    """Celery task for Structural Audit (Stage 1)."""
     db = SessionLocal()
     
     try:
@@ -182,12 +176,69 @@ def seo_audit_task(self, job_id: str, input_filename: str, limit: int = 1):
             job.total_items = total_items
             db.commit()
         
-        # Run Audit
-        from app.services.seo_audit import StructuralAuditService
+        # Run Structural Audit
+        from app.services import StructuralAuditService
         auditor = StructuralAuditService()
         results = auditor.run_audit(
             input_filename=input_filename,
             limit=limit,
+            progress_callback=update_progress
+        )
+        
+        # Update job with results
+        job.status = JobStatus.COMPLETED
+        job.result_file = results['output_filename']
+        job.total_items = results['total_processed']
+        job.processed_items = results['total_processed']
+        job.completed_at = func.now()
+        db.commit()
+        
+        return {
+            'status': 'completed',
+            'filename': results['output_filename'],
+            'total_processed': results['total_processed']
+        }
+        
+    except Exception as e:
+        # Update job status to failed
+        job = db.query(Job).filter(Job.id == job_id).first()
+        if job:
+            job.status = JobStatus.FAILED
+            job.error_message = str(e)
+            job.completed_at = func.now()
+            db.commit()
+        
+        raise e
+        
+    finally:
+        db.close()
+
+
+@celery_app.task(bind=True, base=DatabaseTask)
+def lead_scoring_task(self, job_id: str, input_filename: str):
+    """Celery task for Lead Scoring (Stage 2)."""
+    db = SessionLocal()
+    
+    try:
+        # Update job status to processing
+        job = db.query(Job).filter(Job.id == job_id).first()
+        if not job:
+            raise ValueError(f"Job {job_id} not found")
+        
+        job.status = JobStatus.PROCESSING
+        db.commit()
+        
+        # Progress callback
+        def update_progress(current_item, total_items):
+            job.processed_items = current_item
+            job.total_items = total_items
+            db.commit()
+        
+        # Run Lead Scoring
+        from app.services import LeadScoringService
+        scorer = LeadScoringService()
+        results = scorer.run_scoring(
+            input_filename=input_filename,
             progress_callback=update_progress
         )
         
