@@ -1,0 +1,139 @@
+<mxfile host="app.diagrams.net" modified="2025-12-04T08:45:00.000Z" version="21.0.0">
+  <diagram id="chat-state-machine" name="STD-04: RAG Chat Session State Transition">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;RAG Chat Session State Transition&lt;/b&gt;&lt;br&gt;N-Services SEO Module - AI Chat Assistant Lifecycle" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="250" y="20" width="350" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Initial State -->
+        <mxCell id="initial" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="405" y="80" width="30" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- IDLE State -->
+        <mxCell id="idle" value="Idle" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="350" y="150" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="idle-desc" value="Idle&#xa;Chat window open&#xa;Waiting for input" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="idle">
+          <mxGeometry y="26" width="140" height="44" as="geometry" />
+        </mxCell>
+        
+        <!-- PROCESSING_QUERY State -->
+        <mxCell id="processing" value="Processing Query" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="350" y="280" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="processing-desc" value="Processing Query&#xa;User message sent&#xa;Loading indicator" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="processing">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- RETRIEVING_CONTEXT State -->
+        <mxCell id="retrieving" value="Retrieving Context" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="170" y="280" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="retrieving-desc" value="Retrieving Context&#xa;Vector DB search&#xa;Finding relevant docs" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="retrieving">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- GENERATING_RESPONSE State -->
+        <mxCell id="generating" value="Generating Response" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="170" y="420" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="generating-desc" value="Generating Response&#xa;LLM inference&#xa;Streaming output" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="generating">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- RESPONSE_READY State -->
+        <mxCell id="ready" value="Response Ready" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="350" y="420" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ready-desc" value="Response Ready&#xa;AI reply displayed&#xa;Sources shown" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="ready">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- ERROR State -->
+        <mxCell id="error" value="Error" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="530" y="280" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="error-desc" value="Error&#xa;API failure&#xa;Retry available" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="error">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- Final State -->
+        <mxCell id="final" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="405" y="560" width="30" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Transitions -->
+        <!-- Initial to Idle -->
+        <mxCell id="t1" value="Chat Opened" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="initial" target="idle">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Idle to Processing -->
+        <mxCell id="t2" value="User Sends&#xa;Message" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="idle" target="processing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Processing to Retrieving -->
+        <mxCell id="t3" value="Query Parsed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="processing" target="retrieving">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Retrieving to Generating -->
+        <mxCell id="t4" value="Context Found" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="retrieving" target="generating">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Generating to Ready -->
+        <mxCell id="t5" value="Response&#xa;Complete" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="generating" target="ready">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Ready to Idle -->
+        <mxCell id="t6" value="Ready for&#xa;Next Query" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="ready" target="idle">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="490" y="460" />
+              <mxPoint x="490" y="185" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Processing to Error -->
+        <mxCell id="t7" value="API Error" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="processing" target="error">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Error to Idle -->
+        <mxCell id="t8" value="User Retries" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="error" target="idle">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="600" y="185" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Idle to Final -->
+        <mxCell id="t9" value="Chat Closed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" edge="1" parent="1" source="idle" target="final">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="280" y="185" />
+              <mxPoint x="280" y="575" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Note -->
+        <mxCell id="note" value="&lt;b&gt;RAG Components:&lt;/b&gt;&#xa;• Vector DB: ChromaDB&#xa;• LLM: Gemini&#xa;• Embeddings: HuggingFace" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;spacingLeft=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="550" y="420" width="150" height="80" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

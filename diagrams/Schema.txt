@@ -1,0 +1,213 @@
+       ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │                                         N-SERVICES CLASS DIAGRAM                                         │
+        └─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+        
+        ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │                                        USER MANAGEMENT DOMAIN                                            │
+        └─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+        
+        ┌──────────────────────────────────┐          ┌──────────────────────────────────┐
+        │             User                 │          │         Subscription             │
+        ├──────────────────────────────────┤          ├──────────────────────────────────┤
+        │ - id: UUID [PK]                  │          │ - id: UUID [PK]                  │
+        │ - email: String [UNIQUE]         │          │ - user_id: UUID [FK]             │
+        │ - username: String [UNIQUE]      │          │ - plan_type: SubscriptionPlan    │
+        │ - hashed_password: String        │          │ - status: SubscriptionStatus     │
+        │ - is_active: Boolean             │          │ - stripe_subscription_id: String │
+        │ - is_verified: Boolean           │          │ - current_period_start: DateTime │
+        │ - verification_token: String     │          │ - current_period_end: DateTime   │
+        │ - reset_token: String            │          │ - created_at: DateTime           │
+        │ - reset_token_expires: DateTime  │          │ - updated_at: DateTime           │
+        │ - created_at: DateTime           │          ├──────────────────────────────────┤
+        │ - updated_at: DateTime           │          │ + is_active(): Boolean           │
+        ├──────────────────────────────────┤          │ + days_remaining(): Integer      │
+        │ + verify_password(): Boolean     │          └──────────────────────────────────┘
+        │ + generate_reset_token(): String │                        │
+        │ + get_active_subscription()      │                        │
+        └──────────────────────────────────┘                        │
+                    │ 1                                              │
+                    │                                                │
+                    │ has                                            │ 1
+                    ▼ *                                              │
+        ┌──────────────────────────────────┐          ┌──────────────────────────────────┐
+        │           UserUsage              │          │     <<enumeration>>              │
+        ├──────────────────────────────────┤          │     SubscriptionPlan             │
+        │ - id: UUID [PK]                  │          ├──────────────────────────────────┤
+        │ - user_id: UUID [FK]             │          │ FREE                             │
+        │ - leads_generated: Integer       │          │ STARTER                          │
+        │ - seo_audits_performed: Integer  │          │ PROFESSIONAL                     │
+        │ - enrichments_used: Integer      │          │ ENTERPRISE                       │
+        │ - ai_queries_used: Integer       │          └──────────────────────────────────┘
+        │ - period_start: DateTime         │
+        │ - period_end: DateTime           │          ┌──────────────────────────────────┐
+        ├──────────────────────────────────┤          │     <<enumeration>>              │
+        │ + increment_leads(): void        │          │     SubscriptionStatus           │
+        │ + increment_audits(): void       │          ├──────────────────────────────────┤
+        │ + check_limit(): Boolean         │          │ ACTIVE                           │
+        │ + reset_usage(): void            │          │ CANCELLED                        │
+        └──────────────────────────────────┘          │ PAST_DUE                         │
+                                                      │ TRIALING                         │
+                                                      └──────────────────────────────────┘
+        ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │                                        LEAD MANAGEMENT DOMAIN                                            │
+        └─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+        
+        ┌──────────────────────────────────┐          ┌──────────────────────────────────┐
+        │             Lead                 │          │          LeadSource              │
+        ├──────────────────────────────────┤          ├──────────────────────────────────┤
+        │ - id: UUID [PK]                  │          │ - id: UUID [PK]                  │
+        │ - user_id: UUID [FK]             │          │ - name: String                   │
+        │ - campaign_id: UUID [FK]         │          │ - api_key: String                │
+        │ - business_name: String          │          │ - is_active: Boolean             │
+        │ - website: String                │          ├──────────────────────────────────┤
+        │ - email: String                  │          │ + search(): List<Lead>           │
+        │ - phone: String                  │          └──────────────────────────────────┘
+        │ - address: String                │                        ▲
+        │ - city: String                   │                        │ implements
+        │ - state: String                  │          ┌─────────────┴─────────────┐
+        │ - country: String                │          │                           │
+        │ - industry: String               │   ┌──────┴───────┐          ┌────────┴──────┐
+        │ - rating: Float                  │   │GooglePlaces  │          │  OutScraper   │
+        │ - reviews_count: Integer         │   │   Scraper    │          │   Scraper     │
+        │ - seo_score: Integer             │   ├──────────────┤          ├───────────────┤
+        │ - seo_ranking: SEORanking        │   │- api_key     │          │- api_key      │
+        │ - status: LeadStatus             │   ├──────────────┤          ├───────────────┤
+        │ - is_enriched: Boolean           │   │+ search()    │          │+ search()     │
+        │ - enrichment_data: JSON          │   │+ get_details │          │+ scrape_gmb() │
+        │ - created_at: DateTime           │   └──────────────┘          └───────────────┘
+        │ - updated_at: DateTime           │
+        ├──────────────────────────────────┤
+        │ + enrich(): void                 │
+        │ + calculate_seo_score(): Integer │
+        │ + export_to_csv(): String        │
+        └──────────────────────────────────┘
+                    │
+                    │ *
+                    │
+                    ▼ 1
+        ┌──────────────────────────────────┐          ┌──────────────────────────────────┐
+        │           Campaign               │          │     <<enumeration>>              │
+        ├──────────────────────────────────┤          │        LeadStatus                │
+        │ - id: UUID [PK]                  │          ├──────────────────────────────────┤
+        │ - user_id: UUID [FK]             │          │ NEW                              │
+        │ - name: String                   │          │ CONTACTED                        │
+        │ - description: String            │          │ QUALIFIED                        │
+        │ - search_query: String           │          │ PROPOSAL_SENT                    │
+        │ - location: String               │          │ NEGOTIATION                      │
+        │ - status: CampaignStatus         │          │ WON                              │
+        │ - total_leads: Integer           │          │ LOST                             │
+        │ - enriched_leads: Integer        │          └──────────────────────────────────┘
+        │ - audited_leads: Integer         │
+        │ - created_at: DateTime           │          ┌──────────────────────────────────┐
+        │ - updated_at: DateTime           │          │     <<enumeration>>              │
+        ├──────────────────────────────────┤          │       SEORanking                 │
+        │ + add_leads(): void              │          ├──────────────────────────────────┤
+        │ + get_statistics(): Dict         │          │ EXCELLENT (80-100)               │
+        │ + export_leads(): File           │          │ GOOD (60-79)                     │
+        └──────────────────────────────────┘          │ AVERAGE (40-59)                  │
+                                                      │ POOR (20-39)                     │
+                                                      │ CRITICAL (0-19)                  │
+                                                      └──────────────────────────────────┘
+        ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │                                          SEO AUDIT DOMAIN                                                │
+        └─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+        ┌──────────────────────────────────┐          ┌──────────────────────────────────┐
+        │           SEOAudit               │          │       SEOMetrics                 │
+        ├──────────────────────────────────┤          ├──────────────────────────────────┤
+        │ - id: UUID [PK]                  │          │ - id: UUID [PK]                  │
+        │ - lead_id: UUID [FK]             │          │ - audit_id: UUID [FK]            │
+        │ - user_id: UUID [FK]             │          │ - page_speed_score: Integer      │
+        │ - website_url: String            │          │ - mobile_friendly: Boolean       │
+        │ - overall_score: Integer         │          │ - has_ssl: Boolean               │
+        │ - ranking: SEORanking            │          │ - has_meta_title: Boolean        │
+        │ - status: AuditStatus            │          │ - has_meta_description: Boolean  │
+        │ - created_at: DateTime           │          │ - has_h1_tag: Boolean            │
+        │ - completed_at: DateTime         │          │ - has_alt_tags: Boolean          │
+        ├──────────────────────────────────┤          │ - has_sitemap: Boolean           │
+        │ + run_audit(): SEOMetrics        │          │ - has_robots_txt: Boolean        │
+        │ + generate_report(): Report      │          │ - load_time_ms: Integer          │
+        │ + get_recommendations(): List    │          │ - total_links: Integer           │
+        └──────────────────────────────────┘          │ - broken_links: Integer          │
+                    │                                 │ - image_count: Integer           │
+                    │ 1                               │ - word_count: Integer            │
+                    │                                 ├──────────────────────────────────┤
+                    ▼ *                               │ + calculate_score(): Integer     │
+        ┌──────────────────────────────────┐          └──────────────────────────────────┘
+        │       SEORecommendation          │
+        ├──────────────────────────────────┤          ┌──────────────────────────────────┐
+        │ - id: UUID [PK]                  │          │     <<enumeration>>              │
+        │ - audit_id: UUID [FK]            │          │       AuditStatus                │
+        │ - category: String               │          ├──────────────────────────────────┤
+        │ - priority: Priority             │          │ PENDING                          │
+        │ - issue: String                  │          │ IN_PROGRESS                      │
+        │ - recommendation: String         │          │ COMPLETED                        │
+        │ - impact: String                 │          │ FAILED                           │
+        ├──────────────────────────────────┤          └──────────────────────────────────┘
+        │ + mark_resolved(): void          │
+        └──────────────────────────────────┘
+        ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │                                         AI CHAT DOMAIN                                                   │
+        └─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+        ┌──────────────────────────────────┐          ┌──────────────────────────────────┐
+        │          ChatSession             │          │         ChatMessage              │
+        ├──────────────────────────────────┤          ├──────────────────────────────────┤
+        │ - id: UUID [PK]                  │          │ - id: UUID [PK]                  │
+        │ - user_id: UUID [FK]             │          │ - session_id: UUID [FK]          │
+        │ - title: String                  │          │ - role: MessageRole              │
+        │ - context_type: ContextType      │          │ - content: String                │
+        │ - context_data: JSON             │          │ - tokens_used: Integer           │
+        │ - is_active: Boolean             │          │ - created_at: DateTime           │
+        │ - created_at: DateTime           │          ├──────────────────────────────────┤
+        │ - updated_at: DateTime           │          │ + get_formatted(): String        │
+        ├──────────────────────────────────┤          └──────────────────────────────────┘
+        │ + add_message(): ChatMessage     │
+        │ + get_history(): List            │          ┌──────────────────────────────────┐
+        │ + clear_context(): void          │          │     <<enumeration>>              │
+        └──────────────────────────────────┘          │       MessageRole                │
+                                                      ├──────────────────────────────────┤
+                                                      │ USER                             │
+                                                      │ ASSISTANT                        │
+                                                      │ SYSTEM                           │
+                                                      └──────────────────────────────────┘
+        ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │                                         SERVICE LAYER                                                    │
+        └─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+        
+        ┌──────────────────────────────────┐   ┌──────────────────────────────────┐   ┌──────────────────────────────────┐
+        │       <<service>>                │   │       <<service>>                │   │       <<service>>                │
+        │      AuthService                 │   │    LeadGenerationService         │   │      SEOAuditService             │
+        ├──────────────────────────────────┤   ├──────────────────────────────────┤   ├──────────────────────────────────┤
+        │ - jwt_secret: String             │   │ - google_api_key: String         │   │ - page_speed_api: String         │
+        │ - token_expire: Integer          │   │ - outscraper_api: String         │   ├──────────────────────────────────┤
+        ├──────────────────────────────────┤   ├──────────────────────────────────┤   │ + audit_website(): SEOAudit      │
+        │ + register(): User               │   │ + search_leads(): List<Lead>     │   │ + check_ssl(): Boolean           │
+        │ + login(): Token                 │   │ + enrich_leads(): List<Lead>     │   │ + check_mobile(): Boolean        │
+        │ + verify_email(): Boolean        │   │ + filter_leads(): List<Lead>     │   │ + check_meta_tags(): Dict        │
+        │ + reset_password(): Boolean      │   │ + export_leads(): File           │   │ + check_page_speed(): Integer    │
+        │ + refresh_token(): Token         │   │ + import_leads(): List<Lead>     │   │ + generate_report(): Report      │
+        │ + get_current_user(): User       │   └──────────────────────────────────┘   │ + calculate_score(): Integer     │
+        └──────────────────────────────────┘                                          └──────────────────────────────────┘
+        ┌──────────────────────────────────┐   ┌──────────────────────────────────┐   ┌──────────────────────────────────┐
+        │       <<service>>                │   │       <<service>>                │   │       <<service>>                │
+        │    EnrichmentService             │   │      AIAssistantService          │   │     SubscriptionService          │
+        ├──────────────────────────────────┤   ├──────────────────────────────────┤   ├──────────────────────────────────┤
+        │ - hunter_api_key: String         │   │ - openai_api_key: String         │   │ - stripe_api_key: String         │
+        │ - clearbit_api_key: String       │   │ - model: String                  │   ├──────────────────────────────────┤
+        ├──────────────────────────────────┤   │ - vector_store: ChromaDB         │   │ + create_subscription(): Sub     │
+        │ + find_emails(): List<String>    │   ├──────────────────────────────────┤   │ + cancel_subscription(): Boolean │
+        │ + find_social(): Dict            │   │ + chat(): ChatMessage            │   │ + upgrade_plan(): Subscription   │
+        │ + verify_email(): Boolean        │   │ + analyze_leads(): Analysis      │   │ + check_usage(): UsageStats      │
+        │ + get_company_info(): Dict       │   │ + get_recommendations(): List    │   │ + process_webhook(): void        │
+        │ + bulk_enrich(): List<Lead>      │   │ + embed_context(): void          │   └──────────────────────────────────┘
+        └──────────────────────────────────┘   └──────────────────────────────────┘
+        ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+        │                                      BACKGROUND TASKS (CELERY)                                           │
+        └─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+        ┌──────────────────────────────────┐   ┌──────────────────────────────────┐   ┌──────────────────────────────────┐
+        │       <<task>>                   │   │       <<task>>                   │   │       <<task>>                   │
+        │    LeadGenerationTask            │   │      SEOAuditTask                │   │     EnrichmentTask               │
+        ├──────────────────────────────────┤   ├──────────────────────────────────┤   ├──────────────────────────────────┤
+        │ + generate_leads_async()         │   │ + audit_single_website()         │   │ + enrich_single_lead()           │
+        │ + batch_generate()               │   │ + batch_audit()                  │   │ + batch_enrich()                 │
+        │ + schedule_generation()          │   │ + schedule_audit()               │   │ + verify_emails()                │
+        └──────────────────────────────────┘   └──────────────────────────────────┘   └──────────────────────────────────┘T DOMAIN ==================== -->

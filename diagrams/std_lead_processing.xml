@@ -1,0 +1,146 @@
+<mxfile host="app.diagrams.net" modified="2025-12-04T08:45:00.000Z" version="21.0.0">
+  <diagram id="lead-state-machine" name="STD-02: Lead Processing Pipeline">
+    <mxGraphModel dx="1422" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;Lead Processing Pipeline State Transition&lt;/b&gt;&lt;br&gt;N-Services SEO Module - Complete Lead Lifecycle" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="350" y="20" width="400" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Initial State -->
+        <mxCell id="initial" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="85" y="100" width="30" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- EXTRACTION State -->
+        <mxCell id="extraction" value="URL Extraction" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="30" y="180" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="extraction-desc" value="URL_EXTRACTION&#xa;Scraping Google Maps&#xa;Extracting business URLs" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="extraction">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- RAW_LEADS State -->
+        <mxCell id="raw" value="Raw Leads" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="230" y="180" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="raw-desc" value="Raw Leads&#xa;CSV Generated&#xa;Basic info only" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="raw">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- ENRICHMENT State -->
+        <mxCell id="enrichment" value="Contact Enrichment" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="430" y="180" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="enrichment-desc" value="CONTACT_ENRICHMENT&#xa;Crawling websites&#xa;Extracting contacts" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="enrichment">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- ENRICHED State -->
+        <mxCell id="enriched" value="Enriched Leads" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="630" y="180" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="enriched-desc" value="Enriched Leads&#xa;Emails + Social Media&#xa;Ready for audit" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="enriched">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- AUDIT State -->
+        <mxCell id="audit" value="SEO Audit" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="630" y="340" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="audit-desc" value="SEO_AUDIT&#xa;Structural analysis&#xa;Meta tags, headings" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="audit">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- AUDITED State -->
+        <mxCell id="audited" value="Audited Leads" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="430" y="340" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="audited-desc" value="Audited Leads&#xa;SEO issues identified&#xa;Ready for ranking" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="audited">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- RANKING State -->
+        <mxCell id="ranking" value="SEO Ranking" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="230" y="340" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking-desc" value="SEO_RANKING&#xa;PainScore algorithm&#xa;Priority calculation" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="ranking">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- RANKED State -->
+        <mxCell id="ranked" value="Ranked Leads" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="30" y="340" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ranked-desc" value="Ranked Leads&#xa;Sorted by priority&#xa;Ready for outreach" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="ranked">
+          <mxGeometry y="26" width="140" height="54" as="geometry" />
+        </mxCell>
+        
+        <!-- Final State -->
+        <mxCell id="final" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="85" y="480" width="30" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Transitions -->
+        <!-- Initial to Extraction -->
+        <mxCell id="t1" value="User submits&#xa;search query" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="initial" target="extraction">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Extraction to Raw -->
+        <mxCell id="t2" value="URLs extracted&#xa;CSV generated" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="extraction" target="raw">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Raw to Enrichment -->
+        <mxCell id="t3" value="User clicks&#xa;Enrich" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="raw" target="enrichment">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Enrichment to Enriched -->
+        <mxCell id="t4" value="Contacts found" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="enrichment" target="enriched">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Enriched to Audit -->
+        <mxCell id="t5" value="User clicks&#xa;Run Audit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="enriched" target="audit">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Audit to Audited -->
+        <mxCell id="t6" value="Audit complete" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="audit" target="audited">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Audited to Ranking -->
+        <mxCell id="t7" value="User clicks&#xa;Rank Leads" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="audited" target="ranking">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Ranking to Ranked -->
+        <mxCell id="t8" value="Ranking complete" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="ranking" target="ranked">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Ranked to Final -->
+        <mxCell id="t9" value="CSV Downloaded&#xa;Lead used in campaign" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="ranked" target="final">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Optional Skip Path: Raw to Audit -->
+        <mxCell id="t10" value="Skip Enrichment&#xa;(Direct Audit)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" edge="1" parent="1" source="raw" target="audit">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="300" />
+              <mxPoint x="700" y="300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

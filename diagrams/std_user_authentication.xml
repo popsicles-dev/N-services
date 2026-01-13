@@ -1,0 +1,160 @@
+<mxfile host="app.diagrams.net" modified="2025-12-04T08:45:00.000Z" version="21.0.0">
+  <diagram id="user-state-machine" name="STD-03: User Authentication State Transition">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;User Authentication State Transition&lt;/b&gt;&lt;br&gt;N-Services SEO Module - User Session Lifecycle" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="250" y="20" width="350" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Initial State -->
+        <mxCell id="initial" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="405" y="80" width="30" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- VISITOR State -->
+        <mxCell id="visitor" value="Visitor" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="350" y="150" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="visitor-desc" value="Visitor&#xa;Anonymous user&#xa;No session" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="visitor">
+          <mxGeometry y="26" width="140" height="44" as="geometry" />
+        </mxCell>
+        
+        <!-- REGISTERING State -->
+        <mxCell id="registering" value="Registering" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="170" y="280" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="registering-desc" value="Registering&#xa;Form submitted&#xa;Password hashed" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="registering">
+          <mxGeometry y="26" width="140" height="44" as="geometry" />
+        </mxCell>
+        
+        <!-- AUTHENTICATING State -->
+        <mxCell id="authenticating" value="Authenticating" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="530" y="280" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="authenticating-desc" value="Authenticating&#xa;Verifying credentials&#xa;JWT generation" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="authenticating">
+          <mxGeometry y="26" width="140" height="44" as="geometry" />
+        </mxCell>
+        
+        <!-- AUTHENTICATED State -->
+        <mxCell id="authenticated" value="Authenticated" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="350" y="430" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="authenticated-desc" value="Authenticated&#xa;Active session&#xa;Full access granted" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="authenticated">
+          <mxGeometry y="26" width="140" height="44" as="geometry" />
+        </mxCell>
+        
+        <!-- TOKEN_EXPIRED State -->
+        <mxCell id="expired" value="Token Expired" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="560" y="430" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="expired-desc" value="Token Expired&#xa;Access token invalid&#xa;Refresh required" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="expired">
+          <mxGeometry y="26" width="140" height="44" as="geometry" />
+        </mxCell>
+        
+        <!-- FAILED_AUTH State -->
+        <mxCell id="failed" value="Auth Failed" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="530" y="150" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="failed-desc" value="Auth Failed&#xa;Invalid credentials&#xa;Error displayed" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="failed">
+          <mxGeometry y="26" width="140" height="44" as="geometry" />
+        </mxCell>
+        
+        <!-- Final State -->
+        <mxCell id="final" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="405" y="570" width="30" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Transitions -->
+        <!-- Initial to Visitor -->
+        <mxCell id="t1" value="Page Load" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="initial" target="visitor">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Visitor to Registering -->
+        <mxCell id="t2" value="Click Register" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="visitor" target="registering">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Visitor to Authenticating -->
+        <mxCell id="t3" value="Click Login" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="visitor" target="authenticating">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Registering to Authenticating -->
+        <mxCell id="t4" value="Registration&#xa;Successful" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="registering" target="authenticating">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="380" />
+              <mxPoint x="600" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Authenticating to Authenticated -->
+        <mxCell id="t5" value="JWT Token&#xa;Generated" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="authenticating" target="authenticated">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Authenticating to Failed -->
+        <mxCell id="t6" value="Invalid Credentials" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="authenticating" target="failed">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Failed to Visitor -->
+        <mxCell id="t7" value="Try Again" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="failed" target="visitor">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Authenticated to Expired -->
+        <mxCell id="t8" value="Token Expires&#xa;(30 min)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="authenticated" target="expired">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Expired to Authenticated -->
+        <mxCell id="t9" value="Refresh Token&#xa;Valid" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="expired" target="authenticated">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="520" />
+              <mxPoint x="420" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Expired to Visitor -->
+        <mxCell id="t10" value="Refresh Token&#xa;Expired" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" edge="1" parent="1" source="expired" target="visitor">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="720" y="465" />
+              <mxPoint x="720" y="185" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Authenticated to Final (Logout) -->
+        <mxCell id="t11" value="Manual Logout" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="authenticated" target="final">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Self-loop for Authenticated (API Requests) -->
+        <mxCell id="t12" value="API Request&#xa;(Token Valid)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.8;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="authenticated" target="authenticated">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="310" y="465" />
+              <mxPoint x="310" y="486" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Note about tokens -->
+        <mxCell id="note" value="&lt;b&gt;JWT Configuration:&lt;/b&gt;&#xa;• Access Token: 30 min&#xa;• Refresh Token: 7 days&#xa;• Algorithm: HS256" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;spacingLeft=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="130" y="430" width="140" height="80" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

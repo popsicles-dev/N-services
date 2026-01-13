@@ -1,0 +1,337 @@
+<mxfile host="app.diagrams.net" modified="2025-12-04" version="21.0.0">
+  <diagram id="class-diagram" name="N-Services Class Diagram">
+    <mxGraphModel dx="2000" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="2400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- TITLE -->
+        <mxCell id="title" value="N-SERVICES CLASS DIAGRAM" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="600" y="20" width="400" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- USER MANAGEMENT DOMAIN HEADER -->
+        <mxCell id="domain1" value="USER MANAGEMENT DOMAIN" style="swimlane;fontStyle=1;horizontal=1;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="740" height="380" as="geometry"/>
+        </mxCell>
+
+        <!-- User Class -->
+        <mxCell id="user" value="User" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain1">
+          <mxGeometry x="20" y="50" width="220" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_attr" value="- id: UUID [PK]&#xa;- email: String [UNIQUE]&#xa;- username: String [UNIQUE]&#xa;- hashed_password: String&#xa;- is_active: Boolean&#xa;- is_verified: Boolean&#xa;- verification_token: String&#xa;- reset_token: String&#xa;- reset_token_expires: DateTime&#xa;- created_at: DateTime&#xa;- updated_at: DateTime" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="user">
+          <mxGeometry y="26" width="220" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest" vertex="1" parent="user">
+          <mxGeometry y="156" width="220" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_op" value="+ verify_password(): Boolean&#xa;+ generate_reset_token(): String&#xa;+ get_active_subscription()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="user">
+          <mxGeometry y="164" width="220" height="36" as="geometry"/>
+        </mxCell>
+
+        <!-- Subscription Class -->
+        <mxCell id="sub" value="Subscription" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain1">
+          <mxGeometry x="280" y="50" width="220" height="180" as="geometry"/>
+        </mxCell>
+        <mxCell id="sub_attr" value="- id: UUID [PK]&#xa;- user_id: UUID [FK]&#xa;- plan_type: SubscriptionPlan&#xa;- status: SubscriptionStatus&#xa;- stripe_subscription_id: String&#xa;- current_period_start: DateTime&#xa;- current_period_end: DateTime&#xa;- created_at: DateTime&#xa;- updated_at: DateTime" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="sub">
+          <mxGeometry y="26" width="220" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="sub_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest" vertex="1" parent="sub">
+          <mxGeometry y="136" width="220" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="sub_op" value="+ is_active(): Boolean&#xa;+ days_remaining(): Integer" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="sub">
+          <mxGeometry y="144" width="220" height="36" as="geometry"/>
+        </mxCell>
+
+        <!-- UserUsage Class -->
+        <mxCell id="usage" value="UserUsage" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain1">
+          <mxGeometry x="20" y="270" width="220" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="usage_attr" value="- id: UUID [PK]&#xa;- user_id: UUID [FK]&#xa;- leads_generated: Integer&#xa;- seo_audits_performed: Integer" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="usage">
+          <mxGeometry y="26" width="220" height="74" as="geometry"/>
+        </mxCell>
+
+        <!-- SubscriptionPlan Enum -->
+        <mxCell id="subplan" value="&lt;&lt;enumeration&gt;&gt;&#xa;SubscriptionPlan" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333" vertex="1" parent="domain1">
+          <mxGeometry x="540" y="50" width="160" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="subplan_v" value="FREE&#xa;STARTER&#xa;PROFESSIONAL&#xa;ENTERPRISE" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="subplan">
+          <mxGeometry y="40" width="160" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- SubscriptionStatus Enum -->
+        <mxCell id="substatus" value="&lt;&lt;enumeration&gt;&gt;&#xa;SubscriptionStatus" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333" vertex="1" parent="domain1">
+          <mxGeometry x="540" y="170" width="160" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="substatus_v" value="ACTIVE&#xa;CANCELLED&#xa;PAST_DUE&#xa;TRIALING" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="substatus">
+          <mxGeometry y="40" width="160" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- LEAD MANAGEMENT DOMAIN -->
+        <mxCell id="domain2" value="LEAD MANAGEMENT DOMAIN" style="swimlane;fontStyle=1;horizontal=1;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366" vertex="1" parent="1">
+          <mxGeometry x="40" y="470" width="740" height="400" as="geometry"/>
+        </mxCell>
+
+        <!-- Lead Class -->
+        <mxCell id="lead" value="Lead" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain2">
+          <mxGeometry x="20" y="50" width="220" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="lead_attr" value="- id: UUID [PK]&#xa;- user_id: UUID [FK]&#xa;- campaign_id: UUID [FK]&#xa;- business_name: String&#xa;- website: String&#xa;- email: String&#xa;- phone: String&#xa;- city: String&#xa;- industry: String&#xa;- seo_score: Integer&#xa;- seo_ranking: SEORanking&#xa;- status: LeadStatus&#xa;- is_enriched: Boolean" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="lead">
+          <mxGeometry y="26" width="220" height="166" as="geometry"/>
+        </mxCell>
+        <mxCell id="lead_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest" vertex="1" parent="lead">
+          <mxGeometry y="192" width="220" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="lead_op" value="+ enrich(): void&#xa;+ calculate_seo_score(): Integer&#xa;+ export_to_csv(): String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="lead">
+          <mxGeometry y="200" width="220" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Campaign Class -->
+        <mxCell id="camp" value="Campaign" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain2">
+          <mxGeometry x="280" y="50" width="220" height="180" as="geometry"/>
+        </mxCell>
+        <mxCell id="camp_attr" value="- id: UUID [PK]&#xa;- user_id: UUID [FK]&#xa;- name: String&#xa;- description: String&#xa;- search_query: String&#xa;- location: String&#xa;- status: CampaignStatus&#xa;- total_leads: Integer" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="camp">
+          <mxGeometry y="26" width="220" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="camp_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest" vertex="1" parent="camp">
+          <mxGeometry y="136" width="220" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="camp_op" value="+ add_leads(): void&#xa;+ get_statistics(): Dict&#xa;+ export_leads(): File" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="camp">
+          <mxGeometry y="144" width="220" height="36" as="geometry"/>
+        </mxCell>
+
+        <!-- LeadStatus Enum -->
+        <mxCell id="leadstatus" value="&lt;&lt;enumeration&gt;&gt;&#xa;LeadStatus" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333" vertex="1" parent="domain2">
+          <mxGeometry x="540" y="50" width="160" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="leadstatus_v" value="NEW&#xa;CONTACTED&#xa;QUALIFIED&#xa;PROPOSAL_SENT&#xa;WON / LOST" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="leadstatus">
+          <mxGeometry y="40" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- SEORanking Enum -->
+        <mxCell id="seorank" value="&lt;&lt;enumeration&gt;&gt;&#xa;SEORanking" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333" vertex="1" parent="domain2">
+          <mxGeometry x="540" y="190" width="160" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="seorank_v" value="EXCELLENT (80-100)&#xa;GOOD (60-79)&#xa;AVERAGE (40-59)&#xa;POOR (20-39)&#xa;CRITICAL (0-19)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="seorank">
+          <mxGeometry y="40" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- SEO AUDIT DOMAIN -->
+        <mxCell id="domain3" value="SEO AUDIT DOMAIN" style="swimlane;fontStyle=1;horizontal=1;startSize=30;fillColor=#ffe6cc;strokeColor=#d79b00" vertex="1" parent="1">
+          <mxGeometry x="800" y="70" width="500" height="380" as="geometry"/>
+        </mxCell>
+
+        <!-- SEOAudit Class -->
+        <mxCell id="audit" value="SEOAudit" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain3">
+          <mxGeometry x="20" y="50" width="200" height="160" as="geometry"/>
+        </mxCell>
+        <mxCell id="audit_attr" value="- id: UUID [PK]&#xa;- lead_id: UUID [FK]&#xa;- user_id: UUID [FK]&#xa;- website_url: String&#xa;- overall_score: Integer&#xa;- ranking: SEORanking&#xa;- status: AuditStatus" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="audit">
+          <mxGeometry y="26" width="200" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="audit_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest" vertex="1" parent="audit">
+          <mxGeometry y="116" width="200" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="audit_op" value="+ run_audit(): SEOMetrics&#xa;+ generate_report(): Report&#xa;+ get_recommendations(): List" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="audit">
+          <mxGeometry y="124" width="200" height="36" as="geometry"/>
+        </mxCell>
+
+        <!-- SEOMetrics Class -->
+        <mxCell id="metrics" value="SEOMetrics" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain3">
+          <mxGeometry x="260" y="50" width="200" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="metrics_attr" value="- id: UUID [PK]&#xa;- audit_id: UUID [FK]&#xa;- page_speed_score: Integer&#xa;- mobile_friendly: Boolean&#xa;- has_ssl: Boolean&#xa;- has_meta_title: Boolean&#xa;- has_meta_description: Boolean&#xa;- has_h1_tag: Boolean&#xa;- has_sitemap: Boolean&#xa;- load_time_ms: Integer&#xa;- broken_links: Integer" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="metrics">
+          <mxGeometry y="26" width="200" height="136" as="geometry"/>
+        </mxCell>
+        <mxCell id="metrics_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest" vertex="1" parent="metrics">
+          <mxGeometry y="162" width="200" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="metrics_op" value="+ calculate_score(): Integer" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="metrics">
+          <mxGeometry y="170" width="200" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- AuditStatus Enum -->
+        <mxCell id="auditstatus" value="&lt;&lt;enumeration&gt;&gt;&#xa;AuditStatus" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333" vertex="1" parent="domain3">
+          <mxGeometry x="20" y="240" width="160" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="auditstatus_v" value="PENDING&#xa;IN_PROGRESS&#xa;COMPLETED&#xa;FAILED" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="auditstatus">
+          <mxGeometry y="40" width="160" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- AI CHAT DOMAIN -->
+        <mxCell id="domain4" value="AI CHAT DOMAIN" style="swimlane;fontStyle=1;horizontal=1;startSize=30;fillColor=#e1d5e7;strokeColor=#9673a6" vertex="1" parent="1">
+          <mxGeometry x="800" y="470" width="500" height="280" as="geometry"/>
+        </mxCell>
+
+        <!-- ChatSession Class -->
+        <mxCell id="chat" value="ChatSession" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain4">
+          <mxGeometry x="20" y="50" width="200" height="160" as="geometry"/>
+        </mxCell>
+        <mxCell id="chat_attr" value="- id: UUID [PK]&#xa;- user_id: UUID [FK]&#xa;- title: String&#xa;- context_type: ContextType&#xa;- context_data: JSON&#xa;- is_active: Boolean&#xa;- created_at: DateTime" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="chat">
+          <mxGeometry y="26" width="200" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="chat_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest" vertex="1" parent="chat">
+          <mxGeometry y="116" width="200" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="chat_op" value="+ add_message(): ChatMessage&#xa;+ get_history(): List&#xa;+ clear_context(): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="chat">
+          <mxGeometry y="124" width="200" height="36" as="geometry"/>
+        </mxCell>
+
+        <!-- ChatMessage Class -->
+        <mxCell id="msg" value="ChatMessage" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain4">
+          <mxGeometry x="260" y="50" width="200" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="msg_attr" value="- id: UUID [PK]&#xa;- session_id: UUID [FK]&#xa;- role: MessageRole&#xa;- content: String&#xa;- tokens_used: Integer&#xa;- created_at: DateTime" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="msg">
+          <mxGeometry y="26" width="200" height="74" as="geometry"/>
+        </mxCell>
+        <mxCell id="msg_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest" vertex="1" parent="msg">
+          <mxGeometry y="100" width="200" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="msg_op" value="+ get_formatted(): String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="msg">
+          <mxGeometry y="108" width="200" height="22" as="geometry"/>
+        </mxCell>
+
+        <!-- MessageRole Enum -->
+        <mxCell id="msgrole" value="&lt;&lt;enumeration&gt;&gt;&#xa;MessageRole" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333" vertex="1" parent="domain4">
+          <mxGeometry x="260" y="200" width="160" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="msgrole_v" value="USER / ASSISTANT / SYSTEM" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="msgrole">
+          <mxGeometry y="40" width="160" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- SERVICE LAYER -->
+        <mxCell id="domain5" value="SERVICE LAYER" style="swimlane;fontStyle=1;horizontal=1;startSize=30;fillColor=#f8cecc;strokeColor=#b85450" vertex="1" parent="1">
+          <mxGeometry x="40" y="900" width="1260" height="180" as="geometry"/>
+        </mxCell>
+
+        <!-- AuthService -->
+        <mxCell id="authsvc" value="&lt;&lt;service&gt;&gt;&#xa;AuthService" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain5">
+          <mxGeometry x="20" y="50" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="authsvc_op" value="+ register(): User&#xa;+ login(): Token&#xa;+ verify_email(): Boolean&#xa;+ reset_password(): Boolean&#xa;+ refresh_token(): Token" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="authsvc">
+          <mxGeometry y="40" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- LeadGenerationService -->
+        <mxCell id="leadsvc" value="&lt;&lt;service&gt;&gt;&#xa;LeadGenerationService" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain5">
+          <mxGeometry x="220" y="50" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="leadsvc_op" value="+ search_leads(): List&lt;Lead&gt;&#xa;+ enrich_leads(): List&lt;Lead&gt;&#xa;+ filter_leads(): List&lt;Lead&gt;&#xa;+ export_leads(): File&#xa;+ import_leads(): List&lt;Lead&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="leadsvc">
+          <mxGeometry y="40" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- SEOAuditService -->
+        <mxCell id="seosvc" value="&lt;&lt;service&gt;&gt;&#xa;SEOAuditService" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain5">
+          <mxGeometry x="420" y="50" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="seosvc_op" value="+ audit_website(): SEOAudit&#xa;+ check_ssl(): Boolean&#xa;+ check_mobile(): Boolean&#xa;+ check_page_speed(): Integer&#xa;+ generate_report(): Report" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="seosvc">
+          <mxGeometry y="40" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- EnrichmentService -->
+        <mxCell id="enrichsvc" value="&lt;&lt;service&gt;&gt;&#xa;EnrichmentService" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain5">
+          <mxGeometry x="620" y="50" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="enrichsvc_op" value="+ find_emails(): List&lt;String&gt;&#xa;+ find_social(): Dict&#xa;+ verify_email(): Boolean&#xa;+ get_company_info(): Dict&#xa;+ bulk_enrich(): List&lt;Lead&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="enrichsvc">
+          <mxGeometry y="40" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- AIAssistantService -->
+        <mxCell id="aisvc" value="&lt;&lt;service&gt;&gt;&#xa;AIAssistantService" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain5">
+          <mxGeometry x="820" y="50" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="aisvc_op" value="+ chat(): ChatMessage&#xa;+ analyze_leads(): Analysis&#xa;+ get_recommendations(): List&#xa;+ embed_context(): void" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="aisvc">
+          <mxGeometry y="40" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- SubscriptionService -->
+        <mxCell id="subsvc" value="&lt;&lt;service&gt;&gt;&#xa;SubscriptionService" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="domain5">
+          <mxGeometry x="1020" y="50" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="subsvc_op" value="+ create_subscription(): Sub&#xa;+ cancel_subscription(): Boolean&#xa;+ upgrade_plan(): Subscription&#xa;+ check_usage(): UsageStats" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="subsvc">
+          <mxGeometry y="40" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- BACKGROUND TASKS -->
+        <mxCell id="domain6" value="BACKGROUND TASKS (CELERY)" style="swimlane;fontStyle=1;horizontal=1;startSize=30;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333" vertex="1" parent="1">
+          <mxGeometry x="40" y="1100" width="740" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- LeadGenerationTask -->
+        <mxCell id="leadtask" value="&lt;&lt;task&gt;&gt;&#xa;LeadGenerationTask" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#dae8fc;strokeColor=#6c8ebf" vertex="1" parent="domain6">
+          <mxGeometry x="20" y="50" width="180" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="leadtask_op" value="+ generate_leads_async()&#xa;+ batch_generate()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="leadtask">
+          <mxGeometry y="40" width="180" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- SEOAuditTask -->
+        <mxCell id="audittask" value="&lt;&lt;task&gt;&gt;&#xa;SEOAuditTask" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#dae8fc;strokeColor=#6c8ebf" vertex="1" parent="domain6">
+          <mxGeometry x="220" y="50" width="180" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="audittask_op" value="+ audit_single_website()&#xa;+ batch_audit()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="audittask">
+          <mxGeometry y="40" width="180" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- EnrichmentTask -->
+        <mxCell id="enrichtask" value="&lt;&lt;task&gt;&gt;&#xa;EnrichmentTask" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#dae8fc;strokeColor=#6c8ebf" vertex="1" parent="domain6">
+          <mxGeometry x="420" y="50" width="180" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="enrichtask_op" value="+ enrich_single_lead()&#xa;+ batch_enrich()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10" vertex="1" parent="enrichtask">
+          <mxGeometry y="40" width="180" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- RELATIONSHIPS -->
+        <!-- User 1 Subscription -->
+        <mxCell id="rel1" value="1" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0" edge="1" parent="1" source="user" target="sub">
+          <mxGeometry x="-1" y="3" relative="1" as="geometry">
+            <mxPoint x="300" y="200" as="sourcePoint"/>
+            <mxPoint x="460" y="200" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel1_label" value="has" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[]" vertex="1" connectable="0" parent="rel1">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User 1 UserUsage -->
+        <mxCell id="rel2" value="*" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0" edge="1" parent="1" source="user" target="usage">
+          <mxGeometry x="-1" y="3" relative="1" as="geometry">
+            <mxPoint x="170" y="330" as="sourcePoint"/>
+            <mxPoint x="170" y="380" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Campaign 1 Lead -->
+        <mxCell id="rel3" value="*" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0" edge="1" parent="1" source="camp" target="lead">
+          <mxGeometry x="-1" y="3" relative="1" as="geometry">
+            <mxPoint x="380" y="680" as="sourcePoint"/>
+            <mxPoint x="280" y="680" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel3_label" value="contains" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[]" vertex="1" connectable="0" parent="rel3">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- SEOAudit 1 SEOMetrics -->
+        <mxCell id="rel4" value="1" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0" edge="1" parent="1" source="audit" target="metrics">
+          <mxGeometry x="-1" y="3" relative="1" as="geometry">
+            <mxPoint x="1040" y="200" as="sourcePoint"/>
+            <mxPoint x="1140" y="200" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ChatSession 1 ChatMessage -->
+        <mxCell id="rel5" value="*" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0" edge="1" parent="1" source="chat" target="msg">
+          <mxGeometry x="-1" y="3" relative="1" as="geometry">
+            <mxPoint x="1040" y="600" as="sourcePoint"/>
+            <mxPoint x="1140" y="600" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

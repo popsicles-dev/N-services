@@ -1,0 +1,119 @@
+<mxfile host="app.diagrams.net" modified="2025-12-04T08:45:00.000Z" version="21.0.0">
+  <diagram id="job-state-machine" name="STD-01: Job Processing State Transition">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;Job Processing State Transition (Backend Process)&lt;/b&gt;&lt;br&gt;N-Services SEO Module" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="250" y="20" width="350" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Initial State (Black Circle) -->
+        <mxCell id="initial" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="405" y="80" width="30" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- PENDING State -->
+        <mxCell id="pending" value="Pending" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="350" y="160" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="pending-desc" value="Pending&#xa;Job created&#xa;Waiting in queue" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="pending">
+          <mxGeometry y="26" width="140" height="44" as="geometry" />
+        </mxCell>
+        
+        <!-- PROCESSING State -->
+        <mxCell id="processing" value="Processing" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="350" y="310" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="processing-desc" value="Processing&#xa;Task executing&#xa;Progress tracked" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="processing">
+          <mxGeometry y="26" width="140" height="44" as="geometry" />
+        </mxCell>
+        
+        <!-- COMPLETED State -->
+        <mxCell id="completed" value="Completed" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="200" y="460" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="completed-desc" value="Completed&#xa;Result file ready&#xa;Download available" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="completed">
+          <mxGeometry y="26" width="140" height="44" as="geometry" />
+        </mxCell>
+        
+        <!-- FAILED State -->
+        <mxCell id="failed" value="Failed" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="500" y="460" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="failed-desc" value="Failed&#xa;Error recorded&#xa;Retry possible" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="failed">
+          <mxGeometry y="26" width="140" height="44" as="geometry" />
+        </mxCell>
+        
+        <!-- Final State (Bull's Eye) -->
+        <mxCell id="final" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="255" y="580" width="30" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Transitions -->
+        <!-- Initial to Pending -->
+        <mxCell id="t1" value="Job Created" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="initial" target="pending">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Pending to Processing -->
+        <mxCell id="t2" value="Celery Worker&#xa;Picks Up Task" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="pending" target="processing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Processing to Completed -->
+        <mxCell id="t3" value="Task Successful&#xa;(Result File Created)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="processing" target="completed">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="350" y="420" />
+              <mxPoint x="270" y="420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Processing to Failed -->
+        <mxCell id="t4" value="Exception Thrown&#xa;(Error Recorded)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="processing" target="failed">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="490" y="420" />
+              <mxPoint x="570" y="420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Completed to Final -->
+        <mxCell id="t5" value="Job Archived" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="completed" target="final">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Failed to Pending (Retry) -->
+        <mxCell id="t6" value="User Retries Job" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="failed" target="pending">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="680" y="495" />
+              <mxPoint x="680" y="195" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Processing Self-Loop (Progress Update) -->
+        <mxCell id="t7" value="Progress Update&#xa;(processed_items++)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.8;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="processing" target="processing">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="310" y="345" />
+              <mxPoint x="310" y="366" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Job Types Note -->
+        <mxCell id="note" value="&lt;b&gt;Job Types:&lt;/b&gt;&#xa;• URL_EXTRACTION&#xa;• CONTACT_ENRICHMENT&#xa;• SEO_AUDIT&#xa;• SEO_RANKING" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;spacingLeft=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="580" y="160" width="140" height="100" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
