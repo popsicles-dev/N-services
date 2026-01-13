@@ -82,3 +82,14 @@ celerybeat.pid
 .coverage
 htmlcov/
 .pytest_cache/
+
+# ChromaDB / Vector Store Data
+**/chroma_db/
+*.bin
+*.npy
+*.pkl
+
+# Secrets (extra protection)
+*.pem
+*.key
+secrets/
